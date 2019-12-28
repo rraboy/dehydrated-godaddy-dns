@@ -20,3 +20,11 @@ RUN mkdir -p $ROOTDIR && \
 	cd $ROOTDIR/le-godaddy-dns && \
 	python3 -m pip install -r requirements.txt
 
+RUN useradd -M -d /opt/letsencrypt -U -s /bin/bash -u 1000 letsencrypt
+VOLUME /opt/letsencrypt/dehydrated/accounts
+VOLUME /opt/letsencrypt/dehydrated/chains
+VOLUME /opt/letsencrypt/dehydrated/certs
+RUN chown -R letsencrypt:letsencrypt /opt/letsencrypt
+USER letsencrypt
+WORKDIR /opt/letsencrypt
+ENTRYPOINT [ "/opt/letsencrypt/dehydrated/dehydrated", "-c", "-4", "-t", "dns-01", "-k", "/opt/letsencrypt/le-godaddy-dns/godaddy.py" ]
